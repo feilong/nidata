@@ -1,4 +1,5 @@
 import os
+from collections.abc import Iterable
 import numpy as np
 from scipy.stats import zscore
 import datalad.api as dl
@@ -40,6 +41,12 @@ class Dataset(object):
     def get_data(
             self, sid, task, run, lr, z=True, mask=False,
             space=None, flavor=None):
+
+        if isinstance(run, Iterable):
+            ds = [self.get_data(sid, task, run_, lr, z, mask, space, flavor)
+                for run_ in run]
+            ds = np.concatenate(ds, axis=0)
+            return ds
 
         if space is None:
             space = self.space
